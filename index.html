@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Viking Facts</title>
+  <meta name="description" content="Raiders, explorers, gods and runes: epic facts about the Viking Age." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔️</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="vikings">
+  <nav class="nav">
+    <a class="brand" href="./">⚔️ Viking Facts</a>
+    <div class="links">
+      <a href="https://poptartsmmmgood117-bit.github.io/dino-facts-site/">Dinos</a>
+      <a href="./" class="active">Vikings</a>
+      <a href="https://github.com/poptartsmmmgood117-bit/little-chits/blob/feat/norse-theme/docs/norse-theme.md" class="fjordfolk-link" target="_blank" rel="noopener">Fjordfolk ↗</a>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="floaters" aria-hidden="true"></div>
+    <div>
+      <div class="big-emoji" aria-hidden="true">⛵</div>
+      <h1>Viking Facts</h1>
+      <p class="tagline">From Norway's fjords to the shores of North America: raiders, traders, explorers, and the gods they swore by. Meet <span id="item-count">20</span> legends of the Viking Age.</p>
+      <div class="ctas">
+        <a class="btn" href="#legends">Meet the legends</a>
+        <a class="btn ghost" href="#quiz-section">Take the quiz</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="alt">
+    <div class="wrap reveal">
+      <h2 class="section-title">🪓 Random Saga Fact</h2>
+      <p class="section-sub">Spin the rune stone for a new fact.</p>
+      <div class="fact-box">
+        <p id="fact-text" aria-live="polite"></p>
+        <button class="btn" id="fact-btn">ᚱ Another one!</button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap reveal">
+      <div class="stats">
+        <div class="stat"><div class="num">793</div><div class="lbl">Lindisfarne raid kicks off the Viking Age</div></div>
+        <div class="stat"><div class="num">~270</div><div class="lbl">years the Viking Age lasted</div></div>
+        <div class="stat"><div class="num">16</div><div class="lbl">runes in the Younger Futhark</div></div>
+        <div class="stat"><div class="num">~1000</div><div class="lbl">Vikings land in North America</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="alt" id="legends">
+    <div class="wrap">
+      <h2 class="section-title">🛡️ Legends of the North</h2>
+      <p class="section-sub">Real Vikings, Norse gods, and everyday life. Filter by type and tap a card for more.</p>
+      <div class="controls" id="controls">
+        <input id="search" type="search" placeholder="Search the sagas…" aria-label="Search Viking facts" />
+      </div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2 class="section-title">📜 The Viking Age Timeline</h2>
+      <p class="section-sub">Roughly AD 793 to 1066: three centuries that reshaped Europe.</p>
+      <div class="timeline">
+        <div class="tl-item reveal"><h3>Lindisfarne</h3><div class="when">AD 793</div><p>Norse raiders hit the monastery at Lindisfarne in England. The shock across Christian Europe marks the traditional start of the Viking Age.</p></div>
+        <div class="tl-item reveal"><h3>Dublin founded</h3><div class="when">AD 841</div><p>Vikings set up a fortified base, the beginning of the city of Dublin.</p></div>
+        <div class="tl-item reveal"><h3>The Great Heathen Army</h3><div class="when">AD 865</div><p>A huge Viking force invades England and conquers most of its kingdoms. Only Alfred the Great's Wessex holds out.</p></div>
+        <div class="tl-item reveal"><h3>Iceland settled</h3><div class="when">c. AD 874</div><p>Norse settlers arrive in Iceland. In 930 they found the Althing, one of the oldest parliaments in the world.</p></div>
+        <div class="tl-item reveal"><h3>Normandy</h3><div class="when">AD 911</div><p>The Viking leader Rollo is granted land in France. His descendants, the Normans, later conquer England.</p></div>
+        <div class="tl-item reveal"><h3>Vinland</h3><div class="when">c. AD 1000</div><p>Leif Erikson reaches North America, nearly 500 years before Columbus. The site at L'Anse aux Meadows, Newfoundland, proves it.</p></div>
+        <div class="tl-item reveal"><h3>Stamford Bridge</h3><div class="when">AD 1066</div><p>Harald Hardrada dies invading England. His defeat traditionally marks the end of the Viking Age.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="alt">
+    <div class="wrap">
+      <h2 class="section-title">🙅 Myth vs. Fact</h2>
+      <p class="section-sub">Pop culture loves Vikings, but it gets plenty wrong.</p>
+      <div class="myths">
+        <div class="myth reveal"><div class="label m">Myth</div><p>Vikings wore horned helmets.</p><div class="label f">Fact</div><p>No Viking-Age horned helmet has ever been found. The look comes from 1800s costume design, especially for Wagner's operas.</p></div>
+        <div class="myth reveal"><div class="label m">Myth</div><p>"Viking" was the name of a people.</p><div class="label f">Fact</div><p>"Going a-viking" meant going on an overseas raid. Most Norse people were farmers who never raided at all.</p></div>
+        <div class="myth reveal"><div class="label m">Myth</div><p>Vikings were filthy and unkempt.</p><div class="label f">Fact</div><p>Archaeologists find tons of combs, tweezers, and ear spoons. English writers even complained Vikings bathed every Saturday.</p></div>
+        <div class="myth reveal"><div class="label m">Myth</div><p>Vikings drank from skulls.</p><div class="label f">Fact</div><p>That's a mistranslation of an old poem. They drank from horns and cups.</p></div>
+        <div class="myth reveal"><div class="label m">Myth</div><p>Only men were warriors.</p><div class="label f">Fact</div><p>DNA showed a famous warrior grave at Birka, Sweden, belonged to a woman, buried with weapons and a strategy game.</p></div>
+        <div class="myth reveal"><div class="label m">Myth</div><p>Vikings only raided.</p><div class="label f">Fact</div><p>They traded as far as Baghdad. Thousands of Arabic silver coins have been found buried in Scandinavia.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="quiz-section">
+    <div class="wrap">
+      <h2 class="section-title">🧠 Viking Quiz</h2>
+      <p class="section-sub">Are you worthy of Valhalla?</p>
+      <div class="quiz reveal" id="quiz"></div>
+    </div>
+  </section>
+
+  <section class="alt">
+    <div class="promo reveal">
+      <div>
+        <h3>🌊 Want more Norse adventure?</h3>
+        <p><strong>Fjordfolk</strong> is the Norse theme we built for Little Chits, a living AI village you can watch. Tiny villagers in wool cloaks get Norse names like "Astrid of the Fjord" and build timber halls under turf roofs in Fjordhaven and Pineholm.</p>
+      </div>
+      <a class="btn fjordfolk-link" href="https://github.com/poptartsmmmgood117-bit/little-chits/blob/feat/norse-theme/docs/norse-theme.md" target="_blank" rel="noopener">Visit Fjordfolk →</a>
+    </div>
+  </section>
+
+  <section>
+    <div class="promo reveal" style="background: linear-gradient(135deg, rgba(255,122,24,0.2), rgba(61,220,151,0.2));">
+      <div>
+        <h3>🦖 Older than Odin</h3>
+        <p>Go back 66 million years before the first longship and meet the dinosaurs.</p>
+      </div>
+      <a class="btn" href="https://poptartsmmmgood117-bit.github.io/dino-facts-site/">Back to Dinos →</a>
+    </div>
+  </section>
+
+  <footer>Forged with ⚒️ and mead · <a href="https://poptartsmmmgood117-bit.github.io/dino-facts-site/">Dino Facts</a> · <a href="https://github.com/poptartsmmmgood117-bit/little-chits/blob/feat/norse-theme/docs/norse-theme.md" class="fjordfolk-link" target="_blank" rel="noopener">Fjordfolk</a></footer>
+
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Details">
+    <div class="panel">
+      <button class="close" aria-label="Close">✕</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script>
+    window.PAGE = {
+      floaters: ["⛵", "🪓", "🛡️", "⚔️", "🌊", "ᚠ", "ᚱ", "ᛟ"],
+      emptyText: "Nothing found. Lost at sea? 🌊",
+      filterGroups: [{ name: "Types", values: ["Explorer", "Warrior", "Ruler", "God", "Life"] }],
+      facts: [
+        "Vikings reached North America around the year 1000, nearly 500 years before Columbus.",
+        "Viking longships were so light they could be carried over land between rivers.",
+        "Our days Tuesday, Wednesday, Thursday and Friday are named after Norse gods: Tyr, Odin (Woden), Thor, and Frigg.",
+        "Norse women could own property, run farms, and divorce their husbands.",
+        "Vikings used a 'sunstone', probably a crystal like Iceland spar, to find the sun on cloudy days.",
+        "Words like 'sky', 'egg', 'knife', 'window' and 'berserk' all come from Old Norse.",
+        "Iceland's parliament, the Althing, was founded in 930 and is one of the oldest in the world.",
+        "Vikings served as elite bodyguards to the Byzantine emperor. They were called the Varangian Guard.",
+        "A Viking graffiti carving was found in the Hagia Sophia in Istanbul. It says 'Halfdan was here'.",
+        "Vikings played a board game called hnefatafl, a bit like chess.",
+        "Bluetooth is named after Harald 'Bluetooth' Gormsson; its logo combines his initials in runes.",
+        "Some Vikings filed grooves into their front teeth, possibly as a status symbol.",
+        "Vikings made skis and ice skates out of animal bones.",
+        "The Oseberg ship burial, from 834, held two women along with a cart, sleds, and animals.",
+        "Vikings bleached their hair and beards with a strong lye soap. Blonde was in.",
+      ],
+      items: [
+        { name: "Leif Erikson", icon: "🧭", tags: ["Explorer"], meaning: "Leif the Lucky",
+          fact: "The first known European to reach mainland North America, around AD 1000.",
+          stats: "c. 970 – c. 1020 · Iceland & Greenland",
+          extra: ["He called the land 'Vinland' for the grapes (or berries) he found.", "His father was Erik the Red.", "In the US, October 9 is Leif Erikson Day."] },
+        { name: "Erik the Red", icon: "🔥", tags: ["Explorer"],
+          fact: "Founded the first Norse settlement in Greenland after being banished from Iceland.",
+          stats: "c. 950 – c. 1003 · Norway, Iceland, Greenland",
+          extra: ["He named it 'Greenland' to attract settlers. Clever marketing!", "He got his nickname from his red hair and beard.", "Norse Greenland lasted about 450 years."] },
+        { name: "Freydís Eiríksdóttir", icon: "🗡️", tags: ["Explorer", "Warrior"],
+          fact: "Leif's sister, who the sagas say scared off attackers in Vinland while pregnant by slapping a sword on her chest.",
+          stats: "c. 1000 · Greenland & Vinland",
+          extra: ["She appears in both Vinland sagas.", "The sagas show her as fierce and ruthless.", "She led her own expedition to Vinland."] },
+        { name: "Ragnar Lodbrok", icon: "🐍", tags: ["Warrior"], meaning: "Ragnar Hairy-Breeches",
+          fact: "A legendary hero whose story mixes real history and myth. His 'sons' led the Great Heathen Army.",
+          stats: "9th century (legendary)",
+          extra: ["Legend says he died in King Ælla's snake pit.", "His nickname came from protective shaggy trousers.", "Historians still debate whether he was one person or several."] },
+        { name: "Ivar the Boneless", icon: "🦴", tags: ["Warrior"],
+          fact: "A leader of the Great Heathen Army that invaded England in 865.",
+          stats: "Died c. 873",
+          extra: ["Nobody knows for sure where 'Boneless' came from.", "He helped capture York in 866.", "He may also have ruled Dublin."] },
+        { name: "Lagertha", icon: "🛡️", tags: ["Warrior"],
+          fact: "A legendary shieldmaiden who, according to Saxo Grammaticus, fought 'with the courage of a man'.",
+          stats: "Legendary · Norway",
+          extra: ["She appears in the 12th-century Gesta Danorum.", "The story says she was once married to Ragnar.", "Historians debate how common real shieldmaidens were."] },
+        { name: "Harald Bluetooth", icon: "📶", tags: ["Ruler"],
+          fact: "King who united Denmark and Norway. Bluetooth technology is named after him!",
+          stats: "c. 910 – c. 986 · Denmark",
+          extra: ["He raised the Jelling Stones, called 'Denmark's birth certificate'.", "The Bluetooth logo combines his runic initials ᚼ and ᛒ.", "His nickname may have come from a dead tooth."] },
+        { name: "Harald Hardrada", icon: "👑", tags: ["Ruler", "Warrior"], meaning: "Hard ruler",
+          fact: "Often called 'the last great Viking'. He died at Stamford Bridge in 1066.",
+          stats: "c. 1015 – 1066 · Norway",
+          extra: ["He served in the Byzantine Varangian Guard.", "He's said to have stood almost 2 m tall.", "He founded the city of Oslo."] },
+        { name: "Cnut the Great", icon: "🌊", tags: ["Ruler"],
+          fact: "Ruled a 'North Sea Empire' of England, Denmark, and Norway at the same time.",
+          stats: "c. 990 – 1035",
+          extra: ["Legend says he showed his courtiers he couldn't command the tide.", "He was a fairly popular king of England.", "He went on a pilgrimage to Rome in 1027."] },
+        { name: "Rollo", icon: "🏰", tags: ["Ruler"],
+          fact: "A Viking leader given land in France in 911. It became Normandy, 'land of the Northmen'.",
+          stats: "c. 860 – c. 930",
+          extra: ["William the Conqueror was his great-great-great-grandson.", "Legend says he was too big for any horse to carry.", "He was baptized as a Christian named Robert."] },
+        { name: "Odin", icon: "👁️", tags: ["God"], meaning: "The Allfather",
+          fact: "Chief of the gods, who gave up one eye to drink from the well of wisdom.",
+          extra: ["He hung on the world tree Yggdrasil for nine nights to learn the runes.", "His ravens Huginn and Muninn (Thought and Memory) fly the world for him.", "He rides Sleipnir, an eight-legged horse."] },
+        { name: "Thor", icon: "⚡", tags: ["God"],
+          fact: "God of thunder, defender of gods and humans, wielding the hammer Mjölnir.",
+          extra: ["His chariot is pulled by two goats he can eat and resurrect.", "Thursday is named after him.", "Mjölnir pendants were popular Viking jewelry."] },
+        { name: "Loki", icon: "🦊", tags: ["God"],
+          fact: "The trickster god who can change shape. He causes trouble and sometimes fixes it.",
+          extra: ["He's the parent of the wolf Fenrir and the world serpent Jörmungandr.", "He once turned into a mare and gave birth to Sleipnir.", "He plays a key role in Ragnarök."] },
+        { name: "Freyja", icon: "🐈", tags: ["God"],
+          fact: "Goddess of love, beauty, war, and magic, who rides a chariot pulled by two cats.",
+          extra: ["She chooses half of the slain warriors for her hall, Fólkvangr.", "She owns a cloak of falcon feathers that lets her fly.", "She's a master of seiðr magic."] },
+        { name: "Tyr", icon: "✋", tags: ["God"],
+          fact: "God of law and courage who sacrificed his hand to the wolf Fenrir.",
+          extra: ["Tuesday is named after him.", "His rune ᛏ was carved on weapons for victory.", "He may once have been the chief god before Odin."] },
+        { name: "Longships", icon: "⛵", tags: ["Life"],
+          fact: "Fast, flexible ships with a shallow draft, able to sail the open sea and row up rivers.",
+          extra: ["They could sail in water only about 1 m deep.", "Some were over 30 m long.", "Ships carried carved dragon heads, which could be removed near home."] },
+        { name: "Runes", icon: "ᚱ", tags: ["Life"],
+          fact: "The Viking alphabet, the Younger Futhark, had just 16 letters.",
+          extra: ["Runes were designed with straight lines for easy carving into wood or stone.", "Thousands of rune stones survive in Scandinavia.", "Some runic messages are everyday notes, even love letters."] },
+        { name: "The Thing", icon: "⚖️", tags: ["Life"],
+          fact: "Free men gathered at an assembly called a 'thing' to settle disputes and make laws.",
+          extra: ["A 'lawspeaker' recited the laws from memory.", "Norway's parliament is still called the Storting.", "Outlaws could be banished, as Erik the Red was."] },
+        { name: "Farming & Food", icon: "🌾", tags: ["Life"],
+          fact: "Most Vikings were farmers who grew barley and oats and raised cattle, sheep, and pigs.",
+          extra: ["They ate two meals a day: 'day-meal' and 'night-meal'.", "Skyr, a yogurt-like dairy food, is still eaten in Iceland.", "They drank ale and mead."] },
+        { name: "Berserkers", icon: "🐻", tags: ["Warrior"],
+          fact: "Warriors who fought in a trance-like fury. The word may mean 'bear shirt'.",
+          extra: ["Our word 'berserk' comes from them.", "Some sagas say they bit their shields.", "Their wolf-skin counterparts were called úlfheðnar."] },
+      ],
+      quiz: [
+        { q: "Did Vikings wear horned helmets?", options: ["Yes, always", "Only in battle", "No, that's a myth", "Only kings did"], answer: 2, why: "The horns were invented for 19th-century operas." },
+        { q: "Who reached North America around AD 1000?", options: ["Ragnar Lodbrok", "Leif Erikson", "Cnut the Great", "Rollo"], answer: 1, why: "Leif Erikson landed in 'Vinland'." },
+        { q: "Which weekday is named after Thor?", options: ["Tuesday", "Wednesday", "Thursday", "Friday"], answer: 2, why: "Thursday = Thor's day." },
+        { q: "What modern tech is named after a Viking king?", options: ["Wi‑Fi", "Bluetooth", "USB", "Android"], answer: 1, why: "Harald Bluetooth united Danish tribes, like Bluetooth unites devices." },
+        { q: "How many runes were in the Younger Futhark?", options: ["16", "24", "26", "32"], answer: 0, why: "The older futhark had 24; the Viking Age version trimmed it to 16." },
+        { q: "What did Odin sacrifice for wisdom?", options: ["His hand", "His eye", "His hammer", "His horse"], answer: 1, why: "Tyr gave his hand; Odin gave an eye." },
+        { q: "What event marks the traditional start of the Viking Age?", options: ["Battle of Hastings", "Raid on Lindisfarne", "Founding of Dublin", "Settlement of Iceland"], answer: 1, why: "The raid on Lindisfarne in 793." },
+        { q: "Where was a Viking's graffiti found?", options: ["The Colosseum", "The Hagia Sophia", "The Pyramids", "Notre-Dame"], answer: 1, why: "Someone carved 'Halfdan' into a balcony there." },
+      ],
+      quizPerfect: "⚔️ SKÅL! Valhalla awaits you!",
+      quizDone: "A worthy effort. Raid again for a higher score!",
+    };
+  </script>
+  <script src="site.js"></script>
+</body>
+</html>
