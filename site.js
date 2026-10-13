@@ -3,20 +3,6 @@
   const P = window.PAGE;
   const $ = (s) => document.querySelector(s);
 
-  // ---- Floating background critters ----
-  const floaters = $(".floaters");
-  if (floaters) {
-    for (let i = 0; i < 14; i++) {
-      const s = document.createElement("span");
-      s.textContent = P.floaters[i % P.floaters.length];
-      s.style.left = Math.random() * 100 + "%";
-      s.style.animationDuration = 10 + Math.random() * 14 + "s";
-      s.style.animationDelay = -Math.random() * 20 + "s";
-      s.style.fontSize = 1.6 + Math.random() * 2.4 + "rem";
-      floaters.appendChild(s);
-    }
-  }
-
   // ---- Random fact box ----
   const factText = $("#fact-text");
   let lastFact = -1;
@@ -71,14 +57,15 @@
       const sizeRow = item.size
         ? `<div class="size-row"><small>${P.sizeLabel(item)}</small><div class="bar"><div data-w="${Math.max(4, (item.size / maxSize) * 100)}%"></div></div></div>`
         : "";
+      const no = String(P.items.indexOf(item) + 1).padStart(2, "0");
       el.innerHTML = `
-        <span class="icon">${item.icon}</span>
+        <span class="no">No. ${no}</span>
         <h3>${item.name}</h3>
         ${item.meaning ? `<p class="meaning">“${item.meaning}”</p>` : ""}
-        <div class="tags">${item.tags.map((t) => `<span class="tag ${t}">${t}</span>`).join("")}</div>
+        <div class="tags">${item.tags.map((t) => `<span class="tag">${t}</span>`).join("")}</div>
         <p class="fact">${item.fact}</p>
         ${sizeRow}
-        <div class="more">Tap for more →</div>`;
+        <div class="more">Read more →</div>`;
       el.addEventListener("click", () => openModal(item));
       el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openModal(item); } });
       grid.appendChild(el);
@@ -94,7 +81,7 @@
       ["All", ...group.values].forEach((v) => {
         const b = document.createElement("button");
         b.className = "chip" + (v === "All" ? " on" : "");
-        b.textContent = v === "All" ? `All ${group.name}` : v;
+        b.textContent = v === "All" ? `All ${group.name.toLowerCase()}` : v;
         b.dataset.group = group.name;
         b.addEventListener("click", () => {
           filters[group.name] = v;
@@ -114,11 +101,10 @@
   const modal = $("#modal");
   function openModal(item) {
     $("#modal-body").innerHTML = `
-      <div class="icon">${item.icon}</div>
+      ${item.stats ? `<div class="stats-line">${item.stats}</div>` : ""}
       <h3>${item.name}</h3>
       ${item.meaning ? `<p class="meaning">“${item.meaning}”</p>` : ""}
-      <div class="tags">${item.tags.map((t) => `<span class="tag ${t}">${t}</span>`).join("")}</div>
-      ${item.stats ? `<p><strong>${item.stats}</strong></p>` : ""}
+      <div class="tags">${item.tags.map((t) => `<span class="tag">${t}</span>`).join("")}</div>
       <p>${item.fact}</p>
       ${item.extra ? `<ul>${item.extra.map((x) => `<li>${x}</li>`).join("")}</ul>` : ""}`;
     modal.classList.add("open");
@@ -138,7 +124,7 @@
     const order = [...P.quiz].sort(() => Math.random() - 0.5);
     function showQ() {
       if (qi >= order.length) {
-        quiz.innerHTML = `<p class="q">You scored ${score} / ${order.length}! ${score === order.length ? P.quizPerfect : P.quizDone}</p>
+        quiz.innerHTML = `<p class="score">Final score</p><p class="q">${score} / ${order.length}. ${score === order.length ? P.quizPerfect : P.quizDone}</p>
           <button class="btn" id="quiz-again">Play again</button>`;
         $("#quiz-again").addEventListener("click", () => { qi = 0; score = 0; order.sort(() => Math.random() - 0.5); showQ(); });
         return;
@@ -156,8 +142,8 @@
             if (j === q.answer) x.classList.add("right");
           });
           const fb = quiz.querySelector(".feedback");
-          if (i === q.answer) { score++; fb.textContent = "✅ Correct! " + q.why; }
-          else { b.classList.add("wrong"); fb.textContent = "❌ Not quite. " + q.why; }
+          if (i === q.answer) { score++; fb.textContent = "Correct. " + q.why; }
+          else { b.classList.add("wrong"); fb.textContent = "Wrong. " + q.why; }
           const next = document.createElement("button");
           next.className = "btn";
           next.textContent = qi + 1 < order.length ? "Next question →" : "See my score";

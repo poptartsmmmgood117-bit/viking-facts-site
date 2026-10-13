@@ -4,43 +4,48 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Viking Facts</title>
-  <meta name="description" content="Raiders, explorers, gods and runes: epic facts about the Viking Age." />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔️</text></svg>" />
+  <meta name="description" content="Raiders, explorers, Norse gods and runes, plus a rune and Old Norse translator." />
+  <meta property="og:title" content="Viking Facts" />
+  <meta property="og:description" content="Raiders, explorers, Norse gods and runes, plus a rune and Old Norse translator." />
+  <meta name="theme-color" content="#080b0f" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23080b0f'/><path d='M38 18v64M38 22l26 14M38 40l26 14' stroke='%23c8a45c' stroke-width='9' fill='none'/></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@500;700&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+Runic&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="vikings">
   <nav class="nav">
-    <a class="brand" href="./">⚔️ Viking Facts</a>
+    <a class="brand" href="./">Viking<span>·</span>Facts</a>
     <div class="links">
       <a href="https://poptartsmmmgood117-bit.github.io/dino-facts-site/">Dinos</a>
       <a href="./" class="active">Vikings</a>
-      <a href="https://github.com/poptartsmmmgood117-bit/little-chits/blob/feat/norse-theme/docs/norse-theme.md" class="fjordfolk-link" target="_blank" rel="noopener">Fjordfolk ↗</a>
+      <a href="https://poptartsmmmgood117-bit.github.io/roman-facts-site/">Romans</a>
+      <a href="#runes">Runes</a>
+      <a href="https://github.com/poptartsmmmgood117-bit/little-chits/blob/feat/norse-theme/docs/norse-theme.md" target="_blank" rel="noopener">Fjordfolk ↗</a>
     </div>
   </nav>
 
   <header class="hero">
-    <div class="floaters" aria-hidden="true"></div>
-    <div>
-      <div class="big-emoji" aria-hidden="true">⛵</div>
-      <h1>Viking Facts</h1>
-      <p class="tagline">From Norway's fjords to the shores of North America: raiders, traders, explorers, and the gods they swore by. Meet <span id="item-count">20</span> legends of the Viking Age.</p>
+    <div class="ghost-word" aria-hidden="true" style="font-family:'Noto Sans Runic',sans-serif">ᚢᛁᚴᛁᚾᚴᛦ</div>
+    <div class="inner">
+      <p class="kicker">AD 793 – 1066 · The North</p>
+      <h1>Age of <em>Wolves</em></h1>
+      <p class="tagline">Three centuries of raiders, traders and explorers who sailed open boats from Norway's fjords to Baghdad and North America. <span id="item-count">20</span> legends, their gods, and the runes they carved.</p>
       <div class="ctas">
-        <a class="btn" href="#legends">Meet the legends</a>
-        <a class="btn ghost" href="#quiz-section">Take the quiz</a>
+        <a class="btn" href="#runes">Write your name in runes</a>
+        <a class="btn ghost" href="#legends">Meet the legends</a>
       </div>
     </div>
   </header>
 
   <section class="alt">
     <div class="wrap reveal">
-      <h2 class="section-title">🪓 Random Saga Fact</h2>
-      <p class="section-sub">Spin the rune stone for a new fact.</p>
+      <p class="kicker">I · From the Sagas</p>
+      <h2 class="section-title">Random Fact</h2>
       <div class="fact-box">
         <p id="fact-text" aria-live="polite"></p>
-        <button class="btn" id="fact-btn">ᚱ Another one!</button>
+        <button class="btn" id="fact-btn">Next fact</button>
       </div>
     </div>
   </section>
@@ -48,18 +53,54 @@
   <section>
     <div class="wrap reveal">
       <div class="stats">
-        <div class="stat"><div class="num">793</div><div class="lbl">Lindisfarne raid kicks off the Viking Age</div></div>
-        <div class="stat"><div class="num">~270</div><div class="lbl">years the Viking Age lasted</div></div>
-        <div class="stat"><div class="num">16</div><div class="lbl">runes in the Younger Futhark</div></div>
-        <div class="stat"><div class="num">~1000</div><div class="lbl">Vikings land in North America</div></div>
+        <div class="stat"><div class="num">793</div><div class="lbl">Lindisfarne burns</div></div>
+        <div class="stat"><div class="num">~270</div><div class="lbl">Years of the Viking Age</div></div>
+        <div class="stat"><div class="num">16</div><div class="lbl">Runes in the futhark</div></div>
+        <div class="stat"><div class="num">c.1000</div><div class="lbl">Landfall in America</div></div>
       </div>
     </div>
   </section>
 
-  <section class="alt" id="legends">
+  <section class="alt" id="runes">
     <div class="wrap">
-      <h2 class="section-title">🛡️ Legends of the North</h2>
-      <p class="section-sub">Real Vikings, Norse gods, and everyday life. Filter by type and tap a card for more.</p>
+      <p class="kicker">II · Rúnar</p>
+      <h2 class="section-title">Rune Translator</h2>
+      <p class="section-sub">Write anything in Viking-Age runes, or turn English into Old Norse, the language of the sagas, and carve that instead.</p>
+      <div class="tool reveal">
+        <div class="tool-tabs">
+          <button class="on" data-mode="runes">Text → Runes</button>
+          <button data-mode="norse">English → Old Norse</button>
+        </div>
+        <div class="tool-body">
+          <label for="rune-input" id="rune-label">Your name or any text</label>
+          <textarea id="rune-input" rows="2" maxlength="200"></textarea>
+          <div class="row">
+            <div class="seg" role="group" aria-label="Rune alphabet">
+              <button class="on" data-set="younger">Younger Futhark</button>
+              <button data-set="elder">Elder Futhark</button>
+            </div>
+            <button class="btn ghost" id="rune-copy" style="padding:9px 16px">Copy runes</button>
+          </div>
+          <div class="out" id="rune-out" aria-live="polite"></div>
+          <p class="note" id="mode-note">Runes were written by sound, so your name is spelled the way it sounds. Double letters are carved once, as Viking rune carvers did.</p>
+        </div>
+      </div>
+
+      <h3 style="font-size:1.8rem;margin:56px 0 6px">Words of the North</h3>
+      <p class="note" style="margin-top:0">Real lines from the sagas and poems. Click one to carve it.</p>
+      <div class="phrases" id="phrases"></div>
+
+      <h3 style="font-size:1.8rem;margin:56px 0 6px">The Younger Futhark</h3>
+      <p class="note" style="margin-top:0">Each rune had a name, and each name was a word.</p>
+      <div class="alphabet" id="alphabet"></div>
+    </div>
+  </section>
+
+  <section id="legends">
+    <div class="wrap">
+      <p class="kicker">III · The Legends</p>
+      <h2 class="section-title">Legends of the North</h2>
+      <p class="section-sub">Real Vikings, Norse gods and how ordinary people lived. Filter by type and open any entry.</p>
       <div class="controls" id="controls">
         <input id="search" type="search" placeholder="Search the sagas…" aria-label="Search Viking facts" />
       </div>
@@ -67,66 +108,83 @@
     </div>
   </section>
 
-  <section>
-    <div class="wrap">
-      <h2 class="section-title">📜 The Viking Age Timeline</h2>
-      <p class="section-sub">Roughly AD 793 to 1066: three centuries that reshaped Europe.</p>
-      <div class="timeline">
-        <div class="tl-item reveal"><h3>Lindisfarne</h3><div class="when">AD 793</div><p>Norse raiders hit the monastery at Lindisfarne in England. The shock across Christian Europe marks the traditional start of the Viking Age.</p></div>
-        <div class="tl-item reveal"><h3>Dublin founded</h3><div class="when">AD 841</div><p>Vikings set up a fortified base, the beginning of the city of Dublin.</p></div>
-        <div class="tl-item reveal"><h3>The Great Heathen Army</h3><div class="when">AD 865</div><p>A huge Viking force invades England and conquers most of its kingdoms. Only Alfred the Great's Wessex holds out.</p></div>
-        <div class="tl-item reveal"><h3>Iceland settled</h3><div class="when">c. AD 874</div><p>Norse settlers arrive in Iceland. In 930 they found the Althing, one of the oldest parliaments in the world.</p></div>
-        <div class="tl-item reveal"><h3>Normandy</h3><div class="when">AD 911</div><p>The Viking leader Rollo is granted land in France. His descendants, the Normans, later conquer England.</p></div>
-        <div class="tl-item reveal"><h3>Vinland</h3><div class="when">c. AD 1000</div><p>Leif Erikson reaches North America, nearly 500 years before Columbus. The site at L'Anse aux Meadows, Newfoundland, proves it.</p></div>
-        <div class="tl-item reveal"><h3>Stamford Bridge</h3><div class="when">AD 1066</div><p>Harald Hardrada dies invading England. His defeat traditionally marks the end of the Viking Age.</p></div>
-      </div>
-    </div>
-  </section>
-
   <section class="alt">
     <div class="wrap">
-      <h2 class="section-title">🙅 Myth vs. Fact</h2>
-      <p class="section-sub">Pop culture loves Vikings, but it gets plenty wrong.</p>
-      <div class="myths">
-        <div class="myth reveal"><div class="label m">Myth</div><p>Vikings wore horned helmets.</p><div class="label f">Fact</div><p>No Viking-Age horned helmet has ever been found. The look comes from 1800s costume design, especially for Wagner's operas.</p></div>
-        <div class="myth reveal"><div class="label m">Myth</div><p>"Viking" was the name of a people.</p><div class="label f">Fact</div><p>"Going a-viking" meant going on an overseas raid. Most Norse people were farmers who never raided at all.</p></div>
-        <div class="myth reveal"><div class="label m">Myth</div><p>Vikings were filthy and unkempt.</p><div class="label f">Fact</div><p>Archaeologists find tons of combs, tweezers, and ear spoons. English writers even complained Vikings bathed every Saturday.</p></div>
-        <div class="myth reveal"><div class="label m">Myth</div><p>Vikings drank from skulls.</p><div class="label f">Fact</div><p>That's a mistranslation of an old poem. They drank from horns and cups.</p></div>
-        <div class="myth reveal"><div class="label m">Myth</div><p>Only men were warriors.</p><div class="label f">Fact</div><p>DNA showed a famous warrior grave at Birka, Sweden, belonged to a woman, buried with weapons and a strategy game.</p></div>
-        <div class="myth reveal"><div class="label m">Myth</div><p>Vikings only raided.</p><div class="label f">Fact</div><p>They traded as far as Baghdad. Thousands of Arabic silver coins have been found buried in Scandinavia.</p></div>
+      <p class="kicker">IV · Chronicle</p>
+      <h2 class="section-title">The Viking Age</h2>
+      <p class="section-sub">From the first raid to the last stand: AD 793 to 1066.</p>
+      <div class="timeline">
+        <div class="tl-item reveal"><div class="when">AD 793</div><h3>Lindisfarne</h3><p>Norse raiders strike the monastery at Lindisfarne. The shock across Christian Europe marks the traditional start of the Viking Age.</p></div>
+        <div class="tl-item reveal"><div class="when">AD 841</div><h3>Dublin</h3><p>Vikings build a fortified base on the Liffey, the beginning of the city of Dublin.</p></div>
+        <div class="tl-item reveal"><div class="when">AD 865</div><h3>The Great Heathen Army</h3><p>A massive Viking force lands in England and topples kingdom after kingdom. Only Alfred the Great's Wessex holds.</p></div>
+        <div class="tl-item reveal"><div class="when">c. AD 874</div><h3>Iceland</h3><p>Norse settlers reach Iceland. In 930 they found the Althing, one of the oldest parliaments on Earth.</p></div>
+        <div class="tl-item reveal"><div class="when">AD 911</div><h3>Normandy</h3><p>The warlord Rollo is granted land in France. His descendants, the Normans, will conquer England.</p></div>
+        <div class="tl-item reveal"><div class="when">c. AD 1000</div><h3>Vinland</h3><p>Leif Erikson reaches North America, nearly 500 years before Columbus. The site at L'Anse aux Meadows, Newfoundland, proves it.</p></div>
+        <div class="tl-item reveal"><div class="when">AD 1066</div><h3>Stamford Bridge</h3><p>Harald Hardrada falls invading England. His death traditionally closes the Viking Age.</p></div>
       </div>
     </div>
   </section>
 
-  <section id="quiz-section">
+  <section>
     <div class="wrap">
-      <h2 class="section-title">🧠 Viking Quiz</h2>
-      <p class="section-sub">Are you worthy of Valhalla?</p>
+      <p class="kicker">V · Corrections</p>
+      <h2 class="section-title">Myth vs. Fact</h2>
+      <p class="section-sub">Pop culture loves Vikings, and gets a lot of them wrong.</p>
+      <div class="myths">
+        <div class="myth reveal"><div class="label m">Myth</div><p>Vikings wore horned helmets.</p><div class="label f">Fact</div><p>No Viking-Age horned helmet has ever been found. The look comes from 1800s costume design for Wagner's operas.</p></div>
+        <div class="myth reveal"><div class="label m">Myth</div><p>"Viking" was the name of a people.</p><div class="label f">Fact</div><p>"Going a-viking" meant going raiding overseas. Most Norse people were farmers who never raided at all.</p></div>
+        <div class="myth reveal"><div class="label m">Myth</div><p>Vikings were filthy.</p><div class="label f">Fact</div><p>Archaeologists find combs, tweezers and ear spoons everywhere. English writers complained Vikings bathed every Saturday.</p></div>
+        <div class="myth reveal"><div class="label m">Myth</div><p>Vikings drank from skulls.</p><div class="label f">Fact</div><p>A mistranslation of an old poem. They drank from horns and cups.</p></div>
+        <div class="myth reveal"><div class="label m">Myth</div><p>Only men were warriors.</p><div class="label f">Fact</div><p>DNA showed a famous warrior grave at Birka, Sweden, belonged to a woman, buried with weapons and a strategy game.</p></div>
+        <div class="myth reveal"><div class="label m">Myth</div><p>Vikings only raided.</p><div class="label f">Fact</div><p>They traded as far as Baghdad. Thousands of Arabic silver coins lie buried in Scandinavian hoards.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="alt" id="quiz-section">
+    <div class="wrap">
+      <p class="kicker">VI · Trial</p>
+      <h2 class="section-title">Worthy of Valhalla?</h2>
+      <p class="section-sub">Eight questions. Odin is watching.</p>
       <div class="quiz reveal" id="quiz"></div>
     </div>
   </section>
 
-  <section class="alt">
-    <div class="promo reveal">
-      <div>
-        <h3>🌊 Want more Norse adventure?</h3>
-        <p><strong>Fjordfolk</strong> is the Norse theme we built for Little Chits, a living AI village you can watch. Tiny villagers in wool cloaks get Norse names like "Astrid of the Fjord" and build timber halls under turf roofs in Fjordhaven and Pineholm.</p>
-      </div>
-      <a class="btn fjordfolk-link" href="https://github.com/poptartsmmmgood117-bit/little-chits/blob/feat/norse-theme/docs/norse-theme.md" target="_blank" rel="noopener">Visit Fjordfolk →</a>
-    </div>
-  </section>
-
   <section>
-    <div class="promo reveal" style="background: linear-gradient(135deg, rgba(255,122,24,0.2), rgba(61,220,151,0.2));">
-      <div>
-        <h3>🦖 Older than Odin</h3>
-        <p>Go back 66 million years before the first longship and meet the dinosaurs.</p>
+    <div class="wrap">
+      <div class="promo reveal">
+        <div>
+          <p class="kicker">Our other Norse project</p>
+          <h3>Fjordfolk</h3>
+          <p>The Norse theme we built for Little Chits, a living AI village you can watch. Villagers in wool cloaks with names like "Astrid of the Fjord" build timber halls under turf roofs in Fjordhaven and Pineholm.</p>
+        </div>
+        <a class="btn" href="https://github.com/poptartsmmmgood117-bit/little-chits/blob/feat/norse-theme/docs/norse-theme.md" target="_blank" rel="noopener">Visit Fjordfolk ↗</a>
       </div>
-      <a class="btn" href="https://poptartsmmmgood117-bit.github.io/dino-facts-site/">Back to Dinos →</a>
+      <div class="promo reveal">
+        <div>
+          <p class="kicker">Next expedition</p>
+          <h3>Legions &amp; Empire</h3>
+          <p>The empire whose roads the Vikings later walked. Emperors, gladiators and a Roman numeral converter.</p>
+        </div>
+        <a class="btn ghost" href="https://poptartsmmmgood117-bit.github.io/roman-facts-site/">Romans →</a>
+      </div>
+      <div class="promo reveal">
+        <div>
+          <p class="kicker">Older than Odin</p>
+          <h3>Apex Predators</h3>
+          <p>Go back 66 million years before the first longship.</p>
+        </div>
+        <a class="btn ghost" href="https://poptartsmmmgood117-bit.github.io/dino-facts-site/">Dinos →</a>
+      </div>
     </div>
   </section>
 
-  <footer>Forged with ⚒️ and mead · <a href="https://poptartsmmmgood117-bit.github.io/dino-facts-site/">Dino Facts</a> · <a href="https://github.com/poptartsmmmgood117-bit/little-chits/blob/feat/norse-theme/docs/norse-theme.md" class="fjordfolk-link" target="_blank" rel="noopener">Fjordfolk</a></footer>
+  <footer>
+    <div class="wrap">
+      <span>Viking Facts · ᚢᛁᚴᛁᚾᚴᛦ</span>
+      <span><a href="https://poptartsmmmgood117-bit.github.io/dino-facts-site/">Dinos</a><a href="https://poptartsmmmgood117-bit.github.io/roman-facts-site/">Romans</a><a href="https://github.com/poptartsmmmgood117-bit/little-chits/blob/feat/norse-theme/docs/norse-theme.md" target="_blank" rel="noopener">Fjordfolk</a></span>
+    </div>
+  </footer>
 
   <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Details">
     <div class="panel">
@@ -137,8 +195,7 @@
 
   <script>
     window.PAGE = {
-      floaters: ["⛵", "🪓", "🛡️", "⚔️", "🌊", "ᚠ", "ᚱ", "ᛟ"],
-      emptyText: "Nothing found. Lost at sea? 🌊",
+      emptyText: "Nothing found. Lost at sea.",
       filterGroups: [{ name: "Types", values: ["Explorer", "Warrior", "Ruler", "God", "Life"] }],
       facts: [
         "Vikings reached North America around the year 1000, nearly 500 years before Columbus.",
@@ -239,10 +296,11 @@
         { q: "What event marks the traditional start of the Viking Age?", options: ["Battle of Hastings", "Raid on Lindisfarne", "Founding of Dublin", "Settlement of Iceland"], answer: 1, why: "The raid on Lindisfarne in 793." },
         { q: "Where was a Viking's graffiti found?", options: ["The Colosseum", "The Hagia Sophia", "The Pyramids", "Notre-Dame"], answer: 1, why: "Someone carved 'Halfdan' into a balcony there." },
       ],
-      quizPerfect: "⚔️ SKÅL! Valhalla awaits you!",
-      quizDone: "A worthy effort. Raid again for a higher score!",
+      quizPerfect: "Skál. The Valkyries are coming for you.",
+      quizDone: "Not yet worthy. Raid again.",
     };
   </script>
   <script src="site.js"></script>
+  <script src="runes.js"></script>
 </body>
 </html>
