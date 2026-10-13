@@ -49,7 +49,18 @@
     .btn.ghost { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
     .volley { position: fixed; left: 16px; bottom: calc(44px + env(safe-area-inset-bottom, 0px)); width: 76px; height: 76px; border-radius: 50%; border: 2px solid var(--gold); background: rgba(11, 19, 32, 0.8); color: var(--gold); font: 800 13px "Nunito", sans-serif; display: none; place-items: center; touch-action: none; user-select: none; -webkit-user-select: none; }
     .volley.cooling { opacity: .45; }
+    .volley.fire { bottom: calc(132px + env(safe-area-inset-bottom, 0px)); border-color: #ff8a3d; color: #ffb27a; }
     @media (pointer: coarse) { .volley:not([hidden]) { display: grid; } }
+    .shop-list { display: grid; gap: 10px; margin: 14px 0 4px; }
+    .item { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: center; background: #0f1d31; border: 1px solid #2c4568; border-radius: 12px; padding: 10px 12px; }
+    .item h3 { margin: 0; font: 800 16px "Nunito", sans-serif; color: var(--text); }
+    .item p { margin: 0; font-size: 13px; }
+    .item .pips { grid-column: 1; display: flex; gap: 4px; }
+    .item .pips i { width: 18px; height: 6px; border-radius: 3px; background: #2c4568; }
+    .item .pips i.on { background: var(--gold); }
+    .item .btn { grid-column: 2; grid-row: 1 / span 3; padding: 8px 14px; font-size: 14px; white-space: nowrap; }
+    .item .btn:disabled { opacity: .4; cursor: default; }
+    .treasury { font: 800 18px "Nunito", sans-serif; color: var(--gold); }
     .fact { background: #0f1d31; border-left: 3px solid var(--accent); border-radius: 8px; padding: 10px 12px; color: var(--text) !important; }
   </style>
 </head>
@@ -60,8 +71,10 @@
     <span class="pill" id="hud-time">⏳ 2:30</span>
     <span class="pill" id="hud-hull">🛡️ 100</span>
     <span class="pill" id="hud-cargo">💰 0 / 120</span>
-    <span class="pill" id="hud-bank">🏠 0 banked</span>
+    <span class="pill" id="hud-bank">🏠 0 silver</span>
     <span class="pill" id="hud-sunk">⚔️ 0 sunk</span>
+    <span class="pill" id="hud-weather">☀️ Clear</span>
+    <span class="pill btn-small" id="shop-btn" role="button" hidden>🛠 Shipwright (E)</span>
     <span class="grow"></span>
     <span class="pill btn-small" id="mute-btn" role="button" aria-label="Sound on or off">🔊</span>
     <span class="pill btn-small" id="pause-btn" role="button" aria-label="Pause">❚❚</span>
@@ -69,6 +82,7 @@
 
   <div class="toast hidden" id="toast"></div>
   <button class="volley" id="volley-btn" hidden aria-label="Fire a volley of arrows">🏹<br>VOLLEY</button>
+  <button class="volley fire" id="fire-btn" hidden aria-label="Fire flaming arrows">🔥<br>FIRE</button>
 
   <div class="overlay" id="start">
     <div class="panel">
@@ -79,6 +93,9 @@
         <li><b>Row hard:</b> hold <kbd>Space</kbd> (uses crew stamina)</li>
         <li><b>Fight back:</b> <kbd>F</kbd> or <kbd>J</kbd> fires a volley of arrows at the nearest enemy (on phones, tap 🏹). Three hits sink a Saxon ship, and ramming one at full speed hurts it more than you.</li>
         <li>Sunk ships drop silver chests. Sail over them to grab the silver.</li>
+        <li><b>Know your enemy:</b> grey patrols ram, green archer ships keep their distance and shoot, and a purple flagship is slow, tough and very rich.</li>
+        <li><b>Shipwright:</b> at the home fjord press <kbd>E</kbd> (or tap 🛠) to spend silver on a tougher hull, a bigger hold, faster archers, more rowers and <b>fire arrows</b> (<kbd>G</kbd> or 🔥), which set ships burning. Spending never lowers your score.</li>
+        <li><b>Weather:</b> fog hides you from patrols (and them from you). Storms push your ship with the wind.</li>
         <li><b>Touch:</b> hold a finger on the sea and the ship heads there</li>
         <li>Slow down next to a town to raid it. Its archers will shoot back, and the raid alerts nearby patrols.</li>
         <li>Sail back to your home fjord 🏠 to bank silver and repair. Sinking loses your cargo.</li>
@@ -101,6 +118,16 @@
       <h2>Paused</h2>
       <p>The crew rests on their oars.</p>
       <div class="row"><button class="btn" id="resume-btn">Resume</button></div>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="shop">
+    <div class="panel">
+      <h2>🛠 Shipwright</h2>
+      <p>The season clock stops while you're ashore. Your saga counts every piece of silver you bank, so spending here never lowers your score.</p>
+      <div class="treasury" id="shop-treasury">0 silver to spend</div>
+      <div class="shop-list" id="shop-list"></div>
+      <div class="row"><button class="btn" id="shop-close">Set sail</button></div>
     </div>
   </div>
 
@@ -128,9 +155,21 @@
   // ---------- Tuning ----------
   const WORLD_W = 3200, WORLD_H = 2200;
   const SEASON = 150;          // seconds
-  const CARGO_CAP = 120;
+  const UPGRADES = {
+    hull:    { name: "Oak hull", desc: "More hull strength before you sink.", cost: [40, 80, 140], val: [100, 130, 160, 200], fmt: (v) => `${v} hull` },
+    hold:    { name: "Bigger hold", desc: "Carry more silver per voyage.", cost: [40, 80, 140], val: [120, 160, 200, 250], fmt: (v) => `${v} cargo` },
+    archers: { name: "Veteran archers", desc: "Volleys reload faster.", cost: [50, 90, 150], val: [0.9, 0.75, 0.6, 0.45], fmt: (v) => `${v}s reload` },
+    rowers:  { name: "More rowers", desc: "Faster sailing and quicker stamina recovery.", cost: [50, 90, 150], val: [1, 1.08, 1.16, 1.25], fmt: (v) => `+${Math.round((v - 1) * 100)}% speed` },
+    fire:    { name: "Fire arrows", desc: "Press G or tap 🔥. Burning ships keep losing hull for a few seconds.", cost: [70, 110, 160], val: [0, 8, 6, 4.5], fmt: (v) => v ? `${v}s reload` : "locked" },
+  };
   const SHIP_R = 18;
   const PORT = { x: 190, y: WORLD_H / 2, r: 130 };
+
+  const ENEMY_TYPES = {
+    patrol:   { hp: 3, sail: "#556a85", stripe: "#d9dde3", scale: 1,   speed: 1,    cruise: 70, ram: 12, spot: 380, chest: [10, 18] },
+    archer:   { hp: 2, sail: "#4f7a5a", stripe: "#e3e0c8", scale: 1,   speed: 0.95, cruise: 70, ram: 8,  spot: 420, chest: [12, 20], ranged: true },
+    flagship: { hp: 8, sail: "#6a3d7a", stripe: "#e8c872", scale: 1.5, speed: 0.72, cruise: 55, ram: 22, spot: 460, chest: [45, 60] },
+  };
 
   const FACTS = [
     "The raid on the monastery at Lindisfarne in 793 CE is often used to mark the start of the Viking Age.",
@@ -216,6 +255,9 @@
     else if (kind === "sink") { noise(0.7, 0.35, 400); }
     else if (kind === "coin") tone("triangle", 880, 1760, 0.15, 0.15);
     else if (kind === "bank") tone("triangle", 523, 1046, 0.35, 0.2);
+    else if (kind === "fire") { noise(0.4, 0.3, 1200); }
+    else if (kind === "thunder") { noise(1.2, 0.5, 220); }
+    else if (kind === "horn") tone("sawtooth", 110, 98, 0.9, 0.12);
   }
   $("mute-btn") && ($("mute-btn").textContent = muted ? "🔇" : "🔊");
 
@@ -271,6 +313,10 @@
   let state = "menu";       // menu | play | paused | over
   let world, ship, enemies, arrows, wake, time, banked, raids, sinkings, wind, spawnCd, toastTimer;
   let shots, chests, fx, shake, volleyCd, sunkShips, firstKill;
+  let treasury, up, fireCd, weather, flash, flagshipsDue, shopHinted, upgradesBought;
+  const lvl = (k) => UPGRADES[k].val[up[k]];
+  const cargoCap = () => lvl("hold");
+  const maxHull = () => lvl("hull");
   const keys = {};
   let pointer = null;
 
@@ -279,6 +325,8 @@
     ship = { x: PORT.x + 40, y: PORT.y, a: 0, v: 0, hull: 100, cargo: 0, stamina: 1, sunk: 0, hitFlash: 0 };
     enemies = []; arrows = []; wake = [];
     shots = []; chests = []; fx = []; shake = 0; volleyCd = 0; sunkShips = 0; firstKill = true;
+    treasury = 0; up = { hull: 0, hold: 0, archers: 0, rowers: 0, fire: 0 }; fireCd = 0; upgradesBought = 0;
+    weather = { kind: "clear", t: rand(22, 30), k: 0 }; flash = 0; flagshipsDue = [60, 115]; shopHinted = false;
     time = SEASON; banked = 0; raids = 0; sinkings = 0;
     wind = { a: rand(-Math.PI, Math.PI), target: rand(-Math.PI, Math.PI), change: 20 };
     spawnCd = 20;
@@ -299,9 +347,11 @@
     state = s;
     $("start").classList.toggle("hidden", s !== "menu");
     $("paused").classList.toggle("hidden", s !== "paused");
+    $("shop").classList.toggle("hidden", s !== "shop");
     $("end").classList.toggle("hidden", s !== "over");
     $("hud").hidden = s === "menu";
     $("volley-btn").hidden = s !== "play";
+    $("fire-btn").hidden = s !== "play" || !up || up.fire === 0;
   }
 
   function startGame() { initAudio(); newGame(); setState("play"); last = performance.now(); }
@@ -311,14 +361,43 @@
     if (banked > best) saveBest(banked);
     $("end-score").textContent = `${banked} silver`;
     $("end-detail").textContent =
-      `${raids} raid${raids === 1 ? "" : "s"}, ${sunkShips} Saxon ship${sunkShips === 1 ? "" : "s"} sunk, ${sinkings} shipwreck${sinkings === 1 ? "" : "s"}. ` +
+      `${raids} raid${raids === 1 ? "" : "s"}, ${sunkShips} Saxon ship${sunkShips === 1 ? "" : "s"} sunk, ${upgradesBought} upgrade${upgradesBought === 1 ? "" : "s"}, ${sinkings} shipwreck${sinkings === 1 ? "" : "s"}. ` +
       (banked > best ? "A new best saga!" : `Best saga: ${best} silver.`);
     $("end-fact").textContent = "📜 " + FACTS[Math.floor(Math.random() * FACTS.length)];
     hideToast();
     setState("over");
   }
 
+  // ---------- Shipwright ----------
+  const docked = () => ship && ship.sunk <= 0 && dist(ship, PORT) < PORT.r;
+  function openShop() { if (state !== "play" || !docked()) return; renderShop(); setState("shop"); }
+  function closeShop() { if (state === "shop") { setState("play"); last = performance.now(); } }
+  function renderShop() {
+    $("shop-treasury").textContent = `${treasury} silver to spend`;
+    const list = $("shop-list"); list.innerHTML = "";
+    for (const [key, u] of Object.entries(UPGRADES)) {
+      const level = up[key], maxed = level >= u.cost.length, cost = u.cost[level];
+      const row = document.createElement("div"); row.className = "item";
+      row.innerHTML = `<h3></h3><p></p><div class="pips">${u.cost.map((_, i) => `<i class="${i < level ? "on" : ""}"></i>`).join("")}</div><button class="btn"></button>`;
+      row.querySelector("h3").textContent = u.name;
+      row.querySelector("p").textContent = `${u.desc} Now: ${u.fmt(u.val[level])}${maxed ? "" : `, next: ${u.fmt(u.val[level + 1])}`}.`;
+      const b = row.querySelector("button");
+      b.textContent = maxed ? "Maxed" : `Buy · ${cost}`;
+      b.disabled = maxed || treasury < cost;
+      b.onclick = () => {
+        if (maxed || treasury < cost) return;
+        treasury -= cost; up[key]++; upgradesBought++; sfx("bank");
+        if (key === "hull") ship.hull = maxHull();
+        renderShop();
+      };
+      list.appendChild(row);
+    }
+  }
+  $("shop-close").onclick = closeShop;
+  $("shop-btn").onclick = openShop;
+
   function togglePause() {
+    if (state === "shop") { closeShop(); return; }
     if (state === "play") setState("paused");
     else if (state === "paused") { setState("play"); last = performance.now(); }
   }
@@ -326,6 +405,7 @@
   $("start-btn").onclick = startGame;
   $("mute-btn").onclick = toggleMute;
   $("volley-btn").addEventListener("pointerdown", (e) => { e.preventDefault(); if (state === "play") fireVolley(); });
+  $("fire-btn").addEventListener("pointerdown", (e) => { e.preventDefault(); if (state === "play") fireFire(); });
   $("again-btn").onclick = startGame;
   $("resume-btn").onclick = togglePause;
   $("pause-btn").onclick = togglePause;
@@ -337,6 +417,8 @@
     if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(e.code)) e.preventDefault();
     if (e.code === "KeyP" || e.code === "Escape") togglePause();
     if ((e.code === "KeyF" || e.code === "KeyJ") && state === "play" && !e.repeat) fireVolley();
+    if ((e.code === "KeyG" || e.code === "KeyK") && state === "play" && !e.repeat) fireFire();
+    if (e.code === "KeyE" && !e.repeat) { if (state === "play") openShop(); else if (state === "shop") closeShop(); }
     if (e.code === "KeyM") toggleMute();
     if (e.code === "Enter" && (state === "menu" || state === "over")) startGame();
   });
@@ -395,15 +477,16 @@
     time -= dt;
     if (time <= 0) { time = 0; endGame(); return; }
 
-    // Wind slowly shifts.
-    wind.change -= dt;
+    updateWeather(dt);
+    // Wind slowly shifts (faster in a storm).
+    wind.change -= dt * (1 + 2 * stormK());
     if (wind.change <= 0) { wind.target = rand(-Math.PI, Math.PI); wind.change = rand(15, 25); }
     wind.a += clamp(wrapAngle(wind.target - wind.a), -0.15 * dt, 0.15 * dt);
 
     // Sinking: wait, then respawn at port.
     if (ship.sunk > 0) {
       ship.sunk -= dt;
-      if (ship.sunk <= 0) { ship.x = PORT.x + 40; ship.y = PORT.y; ship.a = 0; ship.v = 0; ship.hull = 100; }
+      if (ship.sunk <= 0) { ship.x = PORT.x + 40; ship.y = PORT.y; ship.a = 0; ship.v = 0; ship.hull = maxHull(); }
     } else {
       updateShip(dt);
     }
@@ -414,7 +497,11 @@
     updateShots(dt);
     updateChests(dt);
     volleyCd = Math.max(0, volleyCd - dt);
+    fireCd = Math.max(0, fireCd - dt);
     $("volley-btn").classList.toggle("cooling", volleyCd > 0);
+    $("fire-btn").classList.toggle("cooling", fireCd > 0);
+    $("fire-btn").hidden = up.fire === 0;
+    flash = Math.max(0, flash - dt);
     shake = Math.max(0, shake - 30 * dt);
     for (const f of fx) { f.life -= dt; f.y += (f.vy || -30) * dt; if (f.vx) f.x += f.vx * dt; }
     fx = fx.filter((f) => f.life > 0);
@@ -441,18 +528,18 @@
     }
 
     const hard = keys.Space && ship.stamina > 0.05 && row > 0;
-    ship.stamina = clamp(ship.stamina + (hard ? -0.35 : 0.15) * dt, 0, 1);
+    ship.stamina = clamp(ship.stamina + (hard ? -0.35 : 0.15 * (1 + up.rowers * 0.3)) * dt, 0, 1);
 
-    const sail = 1 + 0.35 * Math.cos(ship.a - wind.a);
-    const maxV = 175 * sail * (hard ? 1.45 : 1) * (1 - 0.25 * (ship.cargo / CARGO_CAP));
+    const sail = 1 + (0.35 + 0.25 * stormK()) * Math.cos(ship.a - wind.a);
+    const maxV = 175 * lvl("rowers") * sail * (hard ? 1.45 : 1) * (1 - 0.25 * (ship.cargo / cargoCap()));
     ship.a += turn * 2.4 * dt * (0.45 + 0.55 * Math.min(1, ship.v / 80));
     if (row > 0) ship.v += 160 * dt;
     else if (row < 0) ship.v -= 220 * dt;
     else ship.v -= 40 * dt;
     ship.v = clamp(ship.v, 0, maxV);
 
-    ship.x += Math.cos(ship.a) * ship.v * dt;
-    ship.y += Math.sin(ship.a) * ship.v * dt;
+    ship.x += Math.cos(ship.a) * ship.v * dt + Math.cos(wind.a) * 45 * stormK() * dt;
+    ship.y += Math.sin(ship.a) * ship.v * dt + Math.sin(wind.a) * 45 * stormK() * dt;
     collideIslands(ship, SHIP_R, () => { if (ship.v > 90) damage(8); ship.v *= 0.3; });
 
     if (ship.v > 30 && Math.random() < dt * 30) {
@@ -463,10 +550,11 @@
     if (dist(ship, PORT) < PORT.r) {
       if (ship.cargo >= 1) {
         const n = Math.round(ship.cargo);
-        banked += n; ship.cargo = 0; sfx("bank");
-        showToast(`🏠 <b>+${n} silver banked!</b> 📜 ${FACTS[Math.floor(Math.random() * FACTS.length)]}`, 7);
+        banked += n; treasury += n; ship.cargo = 0; sfx("bank");
+        if (!shopHinted) { shopHinted = true; showToast(`🏠 <b>+${n} silver banked!</b> Press <b>E</b> or tap <b>🛠 Shipwright</b> to spend it on upgrades.`, 7); }
+        else showToast(`🏠 <b>+${n} silver banked!</b> 📜 ${FACTS[Math.floor(Math.random() * FACTS.length)]}`, 7);
       }
-      ship.hull = Math.min(100, ship.hull + 25 * dt);
+      ship.hull = Math.min(maxHull(), ship.hull + 25 * dt);
     }
   }
 
@@ -476,10 +564,10 @@
       if (time < SEASON - 1 && SEASON - time - v.lastRaid > 20) v.loot = Math.min(v.maxLoot, v.loot + 0.6 * dt);
 
       const d = dist(ship, v);
-      const raiding = ship.sunk <= 0 && d < 95 && ship.v < 70 && v.loot > 0.5 && ship.cargo < CARGO_CAP;
+      const raiding = ship.sunk <= 0 && d < 95 && ship.v < 70 && v.loot > 0.5 && ship.cargo < cargoCap();
       v.raiding = raiding;
       if (raiding) {
-        const take = Math.min(18 * dt, v.loot, CARGO_CAP - ship.cargo);
+        const take = Math.min(18 * dt, v.loot, cargoCap() - ship.cargo);
         v.loot -= take; ship.cargo += take;
         if (SEASON - time - v.lastRaid > 20) {
           raids++;
@@ -507,52 +595,102 @@
 
   const elapsed = () => SEASON - time;
   const enemyCap = () => Math.min(5, 2 + Math.floor(elapsed() / 40));
+  const live = (e) => e.hp > 0;
 
-  function spawnEnemy() {
+  // ---------- Weather ----------
+  const fogK = () => (weather && weather.kind === "fog" ? weather.k : 0);
+  const stormK = () => (weather && weather.kind === "storm" ? weather.k : 0);
+  function updateWeather(dt) {
+    weather.t -= dt;
+    // Ease in at the start of a spell and out before it ends.
+    weather.k = weather.kind === "clear" ? 0 : clamp(Math.min(weather.t / 3, weather.k + dt / 3), 0, 1);
+    if (weather.t <= 0) {
+      if (weather.kind === "clear") {
+        weather = Math.random() < 0.5 ? { kind: "fog", t: rand(14, 20), k: 0 } : { kind: "storm", t: rand(12, 16), k: 0 };
+        if (weather.kind === "fog") showToast("🌫️ <b>Fog rolls in.</b> Patrols can't see far, and neither can you. A good time to slip past.", 5);
+        else { showToast("⛈️ <b>A storm!</b> The wind is fierce and pushes your ship. Sail with it, not against it.", 5); sfx("thunder"); }
+      } else weather = { kind: "clear", t: rand(18, 28), k: 0 };
+    }
+    if (stormK() > 0.5 && Math.random() < dt * 0.25) { flash = 0.18; sfx("thunder"); }
+  }
+
+  // ---------- Enemies ----------
+  function spawnEnemy(type) {
+    if (!type) type = elapsed() > 25 && Math.random() < 0.35 ? "archer" : "patrol";
+    const T = ENEMY_TYPES[type];
     const cam = camera();
     let x, y, tries = 0;
     do {
       const side = Math.floor(Math.random() * 4);
       x = side === 0 ? 30 : side === 1 ? WORLD_W - 30 : rand(30, WORLD_W - 30);
       y = side === 2 ? 30 : side === 3 ? WORLD_H - 30 : rand(30, WORLD_H - 30);
-    } while (tries++ < 20 && x > cam.x - 100 && x < cam.x + cam.w + 100 && y > cam.y - 100 && y < cam.y + cam.h + 100);
-    enemies.push({ x, y, a: rand(-Math.PI, Math.PI), v: 0, hp: 3, chase: 0, bump: 0, flash: 0, wp: randomWaypoint(), sink: 0 });
+    } while (tries++ < 20 && (x > cam.x - 100 && x < cam.x + cam.w + 100 && y > cam.y - 100 && y < cam.y + cam.h + 100 || Math.hypot(x - PORT.x, y - PORT.y) < 600));
+    enemies.push({ type, T, x, y, a: rand(-Math.PI, Math.PI), v: 0, hp: T.hp, chase: 0, bump: 0, flash: 0, wp: randomWaypoint(), sink: 0, burn: 0, burnTick: 0, fireCd: rand(1, 2), orbit: Math.random() < 0.5 ? 1 : -1 });
+    return enemies[enemies.length - 1];
   }
 
   function randomWaypoint() {
     for (let i = 0; i < 30; i++) {
-      const p = { x: rand(300, WORLD_W - 100), y: rand(100, WORLD_H - 100) };
+      const p = { x: rand(500, WORLD_W - 100), y: rand(100, WORLD_H - 100) };
       if (!world.islands.some((isl) => Math.hypot(isl.x - p.x, isl.y - p.y) < isl.r + 60)) return p;
     }
     return { x: WORLD_W / 2, y: WORLD_H / 2 };
   }
 
+  function hurtEnemy(e, n, color = "#ffd27a") {
+    if (!live(e)) return;
+    e.hp -= n; e.flash = 0.18; e.chase = Math.max(e.chase, 8);
+    addText(`-${n}`, e.x, e.y - 30 * e.T.scale, color);
+    if (e.hp <= 0) sinkEnemy(e);
+  }
+
   function sinkEnemy(e) {
-    e.sink = 1.2; sunkShips++;
-    shake = Math.max(shake, 10); sfx("sink");
-    for (let i = 0; i < 14; i++) fx.push({ kind: "splash", x: e.x, y: e.y, vx: rand(-60, 60), vy: rand(-60, 60), life: rand(0.4, 0.9) });
-    chests.push({ x: e.x, y: e.y, silver: Math.round(rand(10, 18)), life: 25, bob: rand(0, 6) });
-    addText("Sunk!", e.x, e.y - 30, "#e8c872");
-    if (firstKill) { firstKill = false; showToast("⚔️ <b>Saxon ship sunk!</b> Grab the floating chest for its silver.", 4); }
+    e.hp = 0; e.sink = 1.2; sunkShips++; e.burn = 0;
+    shake = Math.max(shake, e.type === "flagship" ? 18 : 10); sfx("sink");
+    for (let i = 0; i < 14 * e.T.scale; i++) fx.push({ kind: "splash", x: e.x, y: e.y, vx: rand(-70, 70), vy: rand(-70, 70), life: rand(0.4, 0.9) });
+    chests.push({ x: e.x, y: e.y, silver: Math.round(rand(e.T.chest[0], e.T.chest[1])), life: e.type === "flagship" ? 40 : 25, bob: rand(0, 6), big: e.type === "flagship" });
+    addText(e.type === "flagship" ? "FLAGSHIP SUNK!" : "Sunk!", e.x, e.y - 34, "#e8c872");
+    if (e.type === "flagship") showToast("⚑ <b>The flagship goes down!</b> Its treasure chest is floating free. Grab it before it sinks.", 5);
+    else if (firstKill) { firstKill = false; showToast("⚔️ <b>Saxon ship sunk!</b> Grab the floating chest for its silver.", 4); }
   }
 
   function updateEnemies(dt) {
     spawnCd -= dt;
-    if (spawnCd <= 0) { spawnCd = Math.max(12, 22 - elapsed() / 15); if (enemies.length < enemyCap()) spawnEnemy(); }
+    if (spawnCd <= 0) { spawnCd = Math.max(12, 22 - elapsed() / 15); if (enemies.filter((e) => live(e) && e.type !== "flagship").length < enemyCap()) spawnEnemy(); }
+    if (flagshipsDue.length && elapsed() >= flagshipsDue[0]) {
+      flagshipsDue.shift();
+      spawnEnemy("flagship");
+      sfx("horn");
+      showToast("⚑ <b>A Saxon flagship has put to sea!</b> It's slow and tough, rams hard, and carries a fortune in silver.", 6);
+    }
 
     const chaseSpeed = Math.min(135, 108 + elapsed() * 0.18);
+    const sight = 1 - 0.55 * fogK();
     for (const e of enemies) {
+      const T = e.T;
       e.bump = Math.max(0, e.bump - dt); e.flash = Math.max(0, e.flash - dt);
       if (e.sink > 0) { e.sink -= dt; continue; }
+      if (e.burn > 0) {
+        e.burn -= dt; e.burnTick -= dt;
+        if (Math.random() < dt * 25) fx.push({ kind: "flame", x: e.x + rand(-12, 12) * T.scale, y: e.y + rand(-8, 8) * T.scale, vy: -rand(20, 50), life: rand(0.3, 0.7) });
+        if (e.burnTick <= 0) { e.burnTick = 1.2; hurtEnemy(e, 1, "#ff9a4a"); if (!live(e)) continue; }
+      }
       const dShip = dist(e, ship);
-      // Spot the player when close; lose interest after a while if they get away.
-      if (ship.sunk <= 0 && dShip < 380) e.chase = Math.max(e.chase, 6);
+      // Spot the player when close (less in fog); lose interest after a while if they get away.
+      if (ship.sunk <= 0 && dShip < T.spot * sight) e.chase = Math.max(e.chase, 6);
       else e.chase = Math.max(0, e.chase - dt);
       const chasing = e.chase > 0 && ship.sunk <= 0;
 
       let gx, gy;
-      if (chasing) { gx = ship.x - e.x; gy = ship.y - e.y; }
-      else {
+      if (chasing) {
+        gx = ship.x - e.x; gy = ship.y - e.y;
+        if (T.ranged) {
+          // Archers hold off at bow range and circle.
+          const l = Math.hypot(gx, gy) || 1;
+          if (dShip < 210) { gx = -gx; gy = -gy; }
+          else if (dShip < 290) { const px = -gy / l * e.orbit, py = gx / l * e.orbit; gx = px * l; gy = py * l; }
+        }
+      } else {
         if (Math.hypot(e.wp.x - e.x, e.wp.y - e.y) < 80) e.wp = randomWaypoint();
         gx = e.wp.x - e.x; gy = e.wp.y - e.y;
       }
@@ -566,37 +704,48 @@
       }
       const want = Math.atan2(gy, gx);
       e.a += clamp(wrapAngle(want - e.a), -1.6 * dt, 1.6 * dt);
-      const target = chasing ? chaseSpeed : 70;
+      const target = (chasing ? chaseSpeed : T.cruise) * T.speed;
       e.v += clamp(target - e.v, -90 * dt, 70 * dt);
-      e.x += Math.cos(e.a) * e.v * dt;
-      e.y += Math.sin(e.a) * e.v * dt;
-      collideIslands(e, SHIP_R, () => { e.v *= 0.5; });
+      e.x += Math.cos(e.a) * e.v * dt + Math.cos(wind.a) * 45 * stormK() * dt;
+      e.y += Math.sin(e.a) * e.v * dt + Math.sin(wind.a) * 45 * stormK() * dt;
+      collideIslands(e, SHIP_R * T.scale, () => { e.v *= 0.5; });
 
-      if (ship.sunk <= 0 && e.bump <= 0 && dShip < SHIP_R * 2.1) {
+      // Archer ships shoot back.
+      if (T.ranged && chasing) {
+        e.fireCd -= dt;
+        if (e.fireCd <= 0 && dShip < 340) {
+          e.fireCd = rand(1.8, 2.4);
+          const lead = dShip / 300;
+          const a = Math.atan2(ship.y + Math.sin(ship.a) * ship.v * lead - e.y, ship.x + Math.cos(ship.a) * ship.v * lead - e.x);
+          for (const off of [-0.08, 0.08]) arrows.push({ x: e.x, y: e.y, vx: Math.cos(a + off) * 300, vy: Math.sin(a + off) * 300, life: 1.3, dmg: 4 });
+        }
+      }
+
+      if (ship.sunk <= 0 && e.bump <= 0 && dShip < SHIP_R * (1 + T.scale) * 1.05) {
         e.bump = 1.2;
         const ramming = ship.v > 115;
-        if (ramming) { e.hp -= 2; damage(4); addText("RAM!", e.x, e.y - 30, "#ffd27a"); }
-        else { e.hp -= 1; damage(12); }
-        e.flash = 0.2;
+        if (ramming) { addText("RAM!", e.x, e.y - 44, "#ffd27a"); damage(e.type === "flagship" ? 10 : 4); hurtEnemy(e, 2); }
+        else { damage(T.ram); hurtEnemy(e, 1); }
         const a = Math.atan2(ship.y - e.y, ship.x - e.x);
         ship.x += Math.cos(a) * 20; ship.y += Math.sin(a) * 20;
-        e.x -= Math.cos(a) * 24; e.y -= Math.sin(a) * 24; e.v = 0;
+        e.x -= Math.cos(a) * 24 / T.scale; e.y -= Math.sin(a) * 24 / T.scale; e.v = 0;
         if (ramming) ship.v *= 0.6;
-        if (e.hp <= 0) sinkEnemy(e);
       }
     }
-    enemies = enemies.filter((e) => !(e.hp <= 0 && e.sink <= 0));
+    enemies = enemies.filter((e) => live(e) || e.sink > 0);
   }
 
   // ---------- Player combat ----------
-  function fireVolley() {
-    if (volleyCd > 0 || ship.sunk > 0) return;
-    volleyCd = 0.9;
-    let target = null, best = 360;
-    for (const e of enemies) { if (e.hp <= 0) continue; const d = dist(e, ship); if (d < best) { best = d; target = e; } }
+  function nearestEnemy(range) {
+    let target = null, best = range;
+    for (const e of enemies) { if (!live(e)) continue; const d = dist(e, ship); if (d < best) { best = d; target = e; } }
+    return target;
+  }
+
+  function loose(target, speed, extra) {
     const aims = [];
     if (target) {
-      const lead = best / 430;
+      const lead = dist(target, ship) / speed;
       aims.push(Math.atan2(target.y + Math.sin(target.a) * target.v * lead - ship.y, target.x + Math.cos(target.a) * target.v * lead - ship.x));
     } else {
       // Nothing in range: loose a broadside off both rails.
@@ -604,21 +753,38 @@
     }
     for (const a0 of aims) for (const off of [-0.09, 0, 0.09]) {
       const a = a0 + off + rand(-0.03, 0.03);
-      shots.push({ x: ship.x, y: ship.y, vx: Math.cos(a) * 430 + Math.cos(ship.a) * ship.v * 0.5, vy: Math.sin(a) * 430 + Math.sin(ship.a) * ship.v * 0.5, life: 0.85 });
+      shots.push({ x: ship.x, y: ship.y, vx: Math.cos(a) * speed + Math.cos(ship.a) * ship.v * 0.5, vy: Math.sin(a) * speed + Math.sin(ship.a) * ship.v * 0.5, life: 0.9, ...extra });
     }
+  }
+
+  function fireVolley() {
+    if (volleyCd > 0 || ship.sunk > 0) return;
+    volleyCd = lvl("archers");
+    loose(nearestEnemy(360), 430, {});
     sfx("volley");
+  }
+
+  function fireFire() {
+    if (ship.sunk > 0) return;
+    if (up.fire === 0) { showToast("🔥 Visit the <b>shipwright</b> at the home fjord to buy fire arrows.", 3); return; }
+    if (fireCd > 0) return;
+    fireCd = lvl("fire");
+    loose(nearestEnemy(380), 400, { fire: true });
+    sfx("fire");
   }
 
   function updateShots(dt) {
     for (const sh of shots) {
       sh.x += sh.vx * dt; sh.y += sh.vy * dt; sh.life -= dt;
+      if (sh.fire && Math.random() < dt * 30) fx.push({ kind: "flame", x: sh.x, y: sh.y, vy: -10, life: 0.25 });
       for (const e of enemies) {
-        if (e.hp <= 0 || sh.life <= 0) continue;
-        if (Math.hypot(sh.x - e.x, sh.y - e.y) < SHIP_R + 6) {
+        if (!live(e) || sh.life <= 0) continue;
+        if (Math.hypot(sh.x - e.x, sh.y - e.y) < SHIP_R * e.T.scale + 6) {
           sh.life = 0; e.flash = 0.15; sfx("hit");
+          if (sh.fire) { if (e.burn <= 0) e.burnTick = 0.6; e.burn = 4.5; }
           // A three-arrow volley that all lands counts as one solid hit.
           e.dmg = (e.dmg || 0) + 1 / 3 + 0.01;
-          if (e.dmg >= 1) { e.dmg -= 1; e.hp -= 1; addText("-1", e.x, e.y - 26, "#ffd27a"); e.chase = Math.max(e.chase, 8); if (e.hp <= 0) sinkEnemy(e); }
+          if (e.dmg >= 1) { e.dmg -= 1; hurtEnemy(e, 1); }
         }
       }
     }
@@ -628,8 +794,8 @@
   function updateChests(dt) {
     for (const c of chests) {
       c.life -= dt;
-      if (ship.sunk <= 0 && dist(c, ship) < 34 && ship.cargo < CARGO_CAP) {
-        const take = Math.min(c.silver, CARGO_CAP - ship.cargo);
+      if (ship.sunk <= 0 && dist(c, ship) < (c.big ? 44 : 34) && ship.cargo < cargoCap()) {
+        const take = Math.min(c.silver, cargoCap() - ship.cargo);
         ship.cargo += take; c.silver -= take;
         addText(`+${Math.round(take)} silver`, c.x, c.y - 20, "#e8c872"); sfx("coin");
         if (c.silver <= 0) c.life = 0;
@@ -643,7 +809,7 @@
   function updateArrows(dt) {
     for (const ar of arrows) {
       ar.x += ar.vx * dt; ar.y += ar.vy * dt; ar.life -= dt;
-      if (ship.sunk <= 0 && Math.hypot(ar.x - ship.x, ar.y - ship.y) < SHIP_R + 4) { damage(6); ar.life = 0; }
+      if (ship.sunk <= 0 && Math.hypot(ar.x - ship.x, ar.y - ship.y) < SHIP_R + 4) { damage(ar.dmg || 6); ar.life = 0; }
     }
     arrows = arrows.filter((a) => a.life > 0);
   }
@@ -679,19 +845,24 @@
       ctx.beginPath(); ctx.moveTo(ar.x, ar.y); ctx.lineTo(ar.x - ar.vx / l * 14, ar.y - ar.vy / l * 14); ctx.stroke();
     }
     for (const c of chests) drawChest(c, t);
-    ctx.strokeStyle = "#ffd27a"; ctx.lineWidth = 2.5;
+    ctx.lineWidth = 2.5;
     for (const sh of shots) {
+      ctx.strokeStyle = sh.fire ? "#ff8a3d" : "#ffd27a";
       const l = Math.hypot(sh.vx, sh.vy);
       ctx.beginPath(); ctx.moveTo(sh.x, sh.y); ctx.lineTo(sh.x - sh.vx / l * 16, sh.y - sh.vy / l * 16); ctx.stroke();
     }
     for (const e of enemies) {
-      if (e.sink > 0) { ctx.globalAlpha = Math.max(0, e.sink / 1.2); }
-      drawShip(e.x, e.y, e.a + (e.sink > 0 ? (1.2 - e.sink) * 0.8 : 0), e.flash > 0 ? "#ffffff" : "#556a85", "#d9dde3", false, t);
-      ctx.globalAlpha = 1;
-      if (e.sink <= 0) {
-        for (let i = 0; i < 3; i++) { ctx.fillStyle = i < e.hp ? "#ff6b6b" : "rgba(0,0,0,0.45)"; ctx.fillRect(e.x - 16 + i * 11, e.y - 34, 9, 4); }
-        if (e.chase > 0) label("!", e.x + 24, e.y - 26);
+      // In fog, far-off ships fade out of sight.
+      const seen = fogK() > 0 ? clamp(1 - (dist(e, ship) - 200) / 140 * fogK(), 0, 1) : 1;
+      if (seen <= 0.02) continue;
+      ctx.globalAlpha = seen * (e.sink > 0 ? Math.max(0, e.sink / 1.2) : 1);
+      drawShip(e.x, e.y, e.a + (e.sink > 0 ? (1.2 - e.sink) * 0.8 : 0), e.flash > 0 ? "#ffffff" : e.T.sail, e.T.stripe, e.type === "flagship", t, e.T.scale);
+      if (live(e)) {
+        const n = e.T.hp, w = 34 * Math.min(1.6, e.T.scale), pw = (w - (n - 1) * 2) / n, top = e.y - 34 * e.T.scale;
+        for (let i = 0; i < n; i++) { ctx.fillStyle = i < e.hp ? "#ff6b6b" : "rgba(0,0,0,0.45)"; ctx.fillRect(e.x - w / 2 + i * (pw + 2), top, pw, 4); }
+        if (e.chase > 0) label(e.T.ranged ? "🏹" : "!", e.x + w / 2 + 8, top + 8);
       }
+      ctx.globalAlpha = 1;
     }
     if (ship.sunk <= 0) drawShip(ship.x, ship.y, ship.a, ship.hitFlash > 0 ? "#ff6b6b" : "#c94b4b", "#f3ead2", true, t);
     else {
@@ -700,7 +871,8 @@
     }
 
     for (const f of fx) {
-      if (f.kind === "splash") { ctx.fillStyle = `rgba(220,240,255,${f.life})`; ctx.beginPath(); ctx.arc(f.x, f.y, 3, 0, Math.PI * 2); ctx.fill(); }
+      if (f.kind === "flame") { ctx.fillStyle = `rgba(255,${120 + Math.floor(f.life * 180)},40,${Math.min(1, f.life * 2)})`; ctx.beginPath(); ctx.arc(f.x, f.y, 2 + f.life * 5, 0, Math.PI * 2); ctx.fill(); }
+      else if (f.kind === "splash") { ctx.fillStyle = `rgba(220,240,255,${f.life})`; ctx.beginPath(); ctx.arc(f.x, f.y, 3, 0, Math.PI * 2); ctx.fill(); }
       else { ctx.globalAlpha = Math.min(1, f.life * 2); ctx.font = "800 16px Nunito, sans-serif"; ctx.textAlign = "center"; ctx.lineWidth = 4; ctx.strokeStyle = "rgba(5,10,18,0.8)"; ctx.strokeText(f.text, f.x, f.y); ctx.fillStyle = f.color; ctx.fillText(f.text, f.x, f.y); ctx.globalAlpha = 1; }
     }
     // Volley range ring while an enemy is close.
@@ -720,6 +892,7 @@
     }
     ctx.restore();
 
+    drawWeather(cam, t);
     drawWindAndMinimap(cam);
     drawStamina();
     updateHud();
@@ -812,11 +985,11 @@
     ctx.fillStyle = "#f3ead2"; ctx.fillText(text, x, y);
   }
 
-  function drawShip(x, y, a, sailColor, stripe, dragon, t) {
+  function drawShip(x, y, a, sailColor, stripe, dragon, t, scale = 1) {
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(a);
-    ctx.scale(1.2, 1.2);
+    ctx.scale(1.2 * scale, 1.2 * scale);
     // Hull
     ctx.fillStyle = "#6b4a2b";
     ctx.beginPath();
@@ -851,13 +1024,40 @@
     ctx.restore();
   }
 
+  function drawWeather(cam, t) {
+    const fk = fogK(), sk = stormK();
+    if (fk > 0) {
+      const sx = (ship.x - cam.x) * zoom, sy = (ship.y - cam.y) * zoom;
+      const g = ctx.createRadialGradient(sx, sy, 130 * zoom, sx, sy, 420 * zoom);
+      g.addColorStop(0, "rgba(205,215,225,0)");
+      g.addColorStop(1, `rgba(205,215,225,${0.88 * fk})`);
+      ctx.fillStyle = g; ctx.fillRect(0, 0, vw, vh);
+    }
+    if (sk > 0) {
+      ctx.fillStyle = `rgba(8,12,26,${0.35 * sk})`; ctx.fillRect(0, 0, vw, vh);
+      ctx.strokeStyle = `rgba(190,210,235,${0.45 * sk})`; ctx.lineWidth = 1;
+      const dx = Math.cos(wind.a) * 10, dy = 18;
+      ctx.beginPath();
+      for (let i = 0; i < 140; i++) {
+        const x = (i * 137.3 + t * 0.9 * (1 + (i % 3) * 0.2) * Math.cos(wind.a)) % vw;
+        const y = (i * 71.9 + t * 0.9) % vh;
+        const px = x < 0 ? x + vw : x;
+        ctx.moveTo(px, y); ctx.lineTo(px + dx, y + dy);
+      }
+      ctx.stroke();
+    }
+    if (flash > 0) { ctx.fillStyle = `rgba(235,240,255,${flash * 3})`; ctx.fillRect(0, 0, vw, vh); }
+  }
+
   function drawChest(c, t) {
+    if (c.big) { ctx.save(); ctx.translate(c.x, c.y); ctx.scale(1.6, 1.6); ctx.translate(-c.x, -c.y); }
     const bob = Math.sin(t / 300 + c.bob) * 2;
     ctx.globalAlpha = c.life < 5 ? 0.4 + 0.6 * Math.abs(Math.sin(t / 120)) : 1;
     ctx.fillStyle = "rgba(220,240,255,0.25)"; ctx.beginPath(); ctx.ellipse(c.x, c.y + 8, 16, 5, 0, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = "#7a4e26"; ctx.fillRect(c.x - 11, c.y - 6 + bob, 22, 14);
     ctx.fillStyle = "#e8c872"; ctx.fillRect(c.x - 11, c.y - 1 + bob, 22, 3); ctx.fillRect(c.x - 2, c.y - 6 + bob, 4, 14);
     ctx.globalAlpha = 1;
+    if (c.big) ctx.restore();
   }
 
   function drawWindAndMinimap(cam) {
@@ -870,7 +1070,12 @@
     for (const isl of world.islands) { ctx.beginPath(); ctx.arc(mx + isl.x * s, my + isl.y * s, Math.max(2, isl.r * s), 0, Math.PI * 2); ctx.fill(); }
     for (const v of world.villages) { ctx.fillStyle = v.loot > 5 ? "#e8c872" : "#7a6f58"; ctx.fillRect(mx + v.x * s - 2.5, my + v.y * s - 2.5, 5, 5); }
     ctx.fillStyle = "#e8c872"; ctx.beginPath(); ctx.arc(mx + PORT.x * s, my + PORT.y * s, 4, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "#9fb3c8"; for (const e of enemies) if (e.hp > 0) ctx.fillRect(mx + e.x * s - 2, my + e.y * s - 2, 4, 4);
+    for (const e of enemies) {
+      if (!live(e) || (fogK() > 0.3 && dist(e, ship) > 320)) continue;
+      const r = e.type === "flagship" ? 3.5 : 2;
+      ctx.fillStyle = e.type === "flagship" ? "#c08ad6" : e.type === "archer" ? "#8fd19e" : "#9fb3c8";
+      ctx.fillRect(mx + e.x * s - r, my + e.y * s - r, r * 2, r * 2);
+    }
     ctx.fillStyle = "#ffd27a"; for (const c of chests) ctx.fillRect(mx + c.x * s - 1.5, my + c.y * s - 1.5, 3, 3);
     ctx.fillStyle = "#ff6b6b"; ctx.beginPath(); ctx.arc(mx + ship.x * s, my + ship.y * s, 3.5, 0, Math.PI * 2); ctx.fill();
     ctx.strokeStyle = "rgba(255,255,255,0.35)"; ctx.strokeRect(mx + cam.x * s, my + cam.y * s, cam.w * s, cam.h * s);
@@ -895,22 +1100,31 @@
     ctx.fillText("CREW STAMINA", x, y - 4);
     const vx = x + w + 16;
     ctx.fillStyle = "rgba(5,15,28,0.75)"; ctx.fillRect(vx, y, 80, 10);
-    ctx.fillStyle = volleyCd > 0 ? "#8a7a55" : "#e8c872"; ctx.fillRect(vx, y, 80 * (1 - volleyCd / 0.9), 10);
+    ctx.fillStyle = volleyCd > 0 ? "#8a7a55" : "#e8c872"; ctx.fillRect(vx, y, 80 * (1 - volleyCd / lvl("archers")), 10);
     ctx.fillStyle = "#cfe9ff"; ctx.fillText(volleyCd > 0 ? "RELOADING" : "VOLLEY (F)", vx, y - 4);
+    if (up.fire > 0) {
+      const fx2 = vx + 96;
+      ctx.fillStyle = "rgba(5,15,28,0.75)"; ctx.fillRect(fx2, y, 80, 10);
+      ctx.fillStyle = fireCd > 0 ? "#7a4a2a" : "#ff8a3d"; ctx.fillRect(fx2, y, 80 * (1 - fireCd / lvl("fire")), 10);
+      ctx.fillStyle = "#cfe9ff"; ctx.fillText(fireCd > 0 ? "KINDLING" : "FIRE (G)", fx2, y - 4);
+    }
   }
 
   let lastHud = "";
   function updateHud() {
     const m = Math.floor(time / 60), s = Math.floor(time % 60);
-    const hud = [m, s, Math.ceil(ship.hull), Math.floor(ship.cargo), banked, sunkShips].join("|");
+    $("shop-btn").hidden = !docked();
+    const hud = [m, s, Math.ceil(ship.hull), Math.floor(ship.cargo), treasury, sunkShips, weather.kind, up.hull, up.hold].join("|");
     if (hud === lastHud) return;
     lastHud = hud;
     $("hud-time").textContent = `${time < 30 ? "❄️" : "⏳"} ${m}:${String(s).padStart(2, "0")}`;
     $("hud-time").classList.toggle("warn", time < 30);
-    $("hud-hull").textContent = `🛡️ ${Math.ceil(ship.hull)}`;
-    $("hud-hull").classList.toggle("warn", ship.hull < 35);
-    $("hud-cargo").textContent = `💰 ${Math.floor(ship.cargo)} / ${CARGO_CAP}`;
-    $("hud-bank").textContent = `🏠 ${banked} banked`;
+    $("hud-hull").textContent = `🛡️ ${Math.ceil(ship.hull)} / ${maxHull()}`;
+    $("hud-hull").classList.toggle("warn", ship.hull < maxHull() * 0.35);
+    $("hud-cargo").textContent = `💰 ${Math.floor(ship.cargo)} / ${cargoCap()}`;
+    $("hud-bank").textContent = `🏠 ${treasury} silver`;
+    $("hud-weather").textContent = weather.kind === "fog" ? "🌫️ Fog" : weather.kind === "storm" ? "⛈️ Storm" : "☀️ Clear";
+    $("hud-weather").classList.toggle("warn", weather.kind === "storm");
     $("hud-sunk").textContent = `⚔️ ${sunkShips} sunk`;
   }
 
